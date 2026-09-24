@@ -39,6 +39,12 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--nav-h) + 1rem);
   -webkit-text-size-adjust: 100%;
+  /* hide native scrollbar — the progress bar + chapter rail are the affordances */
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 body {
