@@ -10,7 +10,8 @@
   --paper: #f7f5f0;
   --paper-deep: #efece4;
   --line: #d9d5cb;
-  --accent: #9c3b1b;
+  --accent: #7c3aed;
+  --accent-soft: #c4b5fd;
 
   --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
   --font-sans: "Inter Variable", "Inter", system-ui, -apple-system,
@@ -262,6 +263,104 @@ ol {
 }
 
 /* ----------------------------------
+   Opening curtain (title card)
+   GPU-cheap: transform/opacity only.
+   Hidden without JS / reduced motion;
+   removed from the DOM when done.
+----------------------------------- */
+
+.curtain {
+  display: none;
+}
+
+.has-js .curtain {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--paper);
+  align-items: center;
+  justify-content: center;
+}
+
+.curtain__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1rem, 3vh, 1.75rem);
+  text-align: center;
+  padding: var(--gutter);
+}
+
+.curtain__label {
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 500;
+}
+
+.curtain__name {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.05em 0.3em;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 12vw, 8rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.curtain__word {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.curtain__word > span {
+  display: inline-block;
+}
+
+.curtain__line {
+  width: min(70vw, 28rem);
+  height: 1px;
+  background: var(--accent);
+}
+
+.curtain__count {
+  position: absolute;
+  right: var(--gutter);
+  bottom: var(--gutter);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.curtain__count::after {
+  content: "%";
+  font-size: 0.5em;
+  margin-left: 0.1em;
+  color: var(--accent);
+}
+
+/* initial states so nothing flashes before Motion takes over */
+.has-js .curtain__label,
+.has-js .curtain__count {
+  opacity: 0;
+}
+
+.has-js .curtain__word > span {
+  transform: translateY(120%);
+}
+
+.has-js .curtain__line {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+/* ----------------------------------
    Background textures
    Subtle tech/agency-style patterns.
    Only set background-image — pair
@@ -313,12 +412,12 @@ ol {
   background-size: 100% 48px;
 }
 
-/* grid + warm corner glow */
+/* grid + warm violet corner glow */
 .tex-glow {
   background-image:
     radial-gradient(
       ellipse 75% 55% at 75% -5%,
-      rgba(156, 59, 27, 0.1),
+      rgba(124, 58, 237, 0.1),
       transparent 62%
     ),
     linear-gradient(to right, rgba(22, 21, 15, 0.05) 1px, transparent 1px),
@@ -351,7 +450,7 @@ ol {
   background-image:
     radial-gradient(
       ellipse 70% 55% at 80% 0%,
-      rgba(156, 59, 27, 0.32),
+      rgba(124, 58, 237, 0.4),
       transparent 65%
     ),
     linear-gradient(to right, rgba(247, 245, 240, 0.05) 1px, transparent 1px),
@@ -403,7 +502,7 @@ html.lenis body {
 
 .scroll-progress__bar {
   height: 100%;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--accent), var(--accent-soft));
   transform: scaleX(0);
   transform-origin: left center;
   will-change: transform;

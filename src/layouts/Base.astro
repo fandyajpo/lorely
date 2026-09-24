@@ -70,6 +70,18 @@ const chapters = [
     </script>
   </head>
   <body>
+    <div class="curtain" aria-hidden="true">
+      <div class="curtain__card">
+        <span class="curtain__label">PR &amp; Artist Communications</span>
+        <div class="curtain__name">
+          <span class="curtain__word"><span>Hairly</span></span>
+          <span class="curtain__word"><span>Baylen</span></span>
+        </div>
+        <div class="curtain__line"></div>
+      </div>
+      <span class="curtain__count">00</span>
+    </div>
+
     <div class="scroll-progress" aria-hidden="true">
       <div class="scroll-progress__bar"></div>
     </div>
@@ -102,6 +114,7 @@ const chapters = [
         Math.min(max, Math.max(min, v));
 
       if (document.documentElement.classList.contains("has-js")) {
+        let resumeScroll: (() => void) | null = null;
         try {
         const [
           { animate, inView, stagger },
@@ -110,12 +123,129 @@ const chapters = [
 
         /* ---------- smooth scroll ---------- */
         const lenis = new Lenis();
+        resumeScroll = () => lenis.start();
+
+        /* ---------- opening curtain ---------- */
+        const runCurtain = async (): Promise<number> => {
+          const curtain = document.querySelector<HTMLElement>(".curtain");
+          if (!curtain) return 0;
+
+          // Play once per session — repeat visits pay zero cost.
+          try {
+            if (sessionStorage.getItem("hairly-intro") === "1") {
+              curtain.remove();
+              return 0;
+            }
+            sessionStorage.setItem("hairly-intro", "1");
+          } catch {
+            /* storage unavailable — just play it */
+          }
+
+          lenis.stop();
+          document.documentElement.style.overflow = "hidden";
+
+          const ease = [0.22, 1, 0.36, 1] as [
+            number,
+            number,
+            number,
+            number,
+          ];
+
+          animate(
+            ".curtain__label",
+            { opacity: [0, 1], y: [10, 0] },
+            { duration: 0.5, ease, delay: 0.1 },
+          );
+          animate(
+            ".curtain__word > span",
+            { y: ["120%", "0%"] },
+            {
+              duration: 0.9,
+              ease,
+              delay: stagger(0.12, { startDelay: 0.35 }),
+            },
+          );
+          animate(
+            ".curtain__line",
+            { scaleX: [0, 1] },
+            {
+              duration: 0.85,
+              ease: [0.65, 0, 0.35, 1] as [
+                number,
+                number,
+                number,
+                number,
+              ],
+              delay: 0.55,
+            },
+          );
+          animate(
+            ".curtain__count",
+            { opacity: [0, 1] },
+            { duration: 0.4, ease, delay: 0.15 },
+          );
+
+          // Counter 0 → 100 (plain rAF — cheaper than a tween library here)
+          const countEl = curtain.querySelector<HTMLElement>(
+            ".curtain__count",
+          );
+          const countDuration = 1150;
+          const countStart = performance.now();
+          await new Promise<void>((resolve) => {
+            const step = (now: number) => {
+              const p = Math.min(1, (now - countStart) / countDuration);
+              const eased = 1 - Math.pow(1 - p, 3);
+              if (countEl) {
+                countEl.textContent = String(
+                  Math.round(eased * 100),
+                ).padStart(2, "0");
+              }
+              if (p < 1) requestAnimationFrame(step);
+              else resolve();
+            };
+            requestAnimationFrame(step);
+          });
+
+          await new Promise((r) => setTimeout(r, 180));
+
+          // Unlock scroll while the curtain still covers the page,
+          // so the scrollbar restore is invisible.
+          document.documentElement.style.overflow = "";
+          lenis.start();
+
+          await new Promise<void>((resolve) => {
+            animate(
+              curtain,
+              { y: ["0%", "-100%"] },
+              {
+                duration: 0.8,
+                ease: [0.76, 0, 0.24, 1] as [
+                  number,
+                  number,
+                  number,
+                  number,
+                ],
+                onComplete: () => resolve(),
+              },
+            );
+          });
+
+          curtain.remove();
+          return 1400;
+        };
+
+        const introMs = await runCurtain();
+        const introDelay = introMs / 1000;
 
         /* ---------- entrance + reveals (Motion) ---------- */
         animate(
           ".nav",
           { opacity: [0, 1], y: [-12, 0] },
-          { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.05 },
+          {
+            duration: 0.6,
+            ease: [0.22, 1, 0.36, 1],
+            delay: introDelay + 0.05,
+          },
         );
 
         const heroItems = document.querySelectorAll<HTMLElement>(
@@ -126,7 +256,9 @@ const chapters = [
             heroItems,
             { opacity: [0, 1], y: [28, 0] },
             {
-              delay: stagger(0.14, { startDelay: 0.15 }),
+              delay: stagger(0.14, {
+                startDelay: introDelay + 0.15,
+              }),
               duration: 0.9,
               ease: [0.22, 1, 0.36, 1],
             },
@@ -336,8 +468,11 @@ const chapters = [
         };
         requestAnimationFrame(frame);
         } catch (err) {
-          // Fail open: never leave content hidden if the scroll engine breaks.
+          // Fail open: never leave content hidden or scroll locked.
           console.error("[scroll-engine]", err);
+          document.documentElement.style.overflow = "";
+          document.querySelector(".curtain")?.remove();
+          resumeScroll?.();
           document.documentElement.classList.remove("has-js");
         }
       }
