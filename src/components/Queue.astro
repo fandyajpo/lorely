@@ -3,40 +3,44 @@ import { queue } from "../data/queue";
 ---
 
 <section class="section queue tex-dark-glow" id="queue" aria-labelledby="queue-title">
-  <div class="shell">
-    <header class="section-head">
-      <div class="stack-sm reveal">
-        <span class="label">Currently</span>
-        <h2 class="section-title" id="queue-title">The Queue</h2>
-      </div>
-      <p class="body-text queue__note">
-        What's on the desk right now — projects, artists, and campaigns in
-        motion.
-      </p>
-    </header>
+  <div class="queue__pin">
+    <div class="shell">
+      <header class="section-head">
+        <div class="stack-sm reveal">
+          <span class="label">Currently</span>
+          <h2 class="section-title" id="queue-title">The Queue</h2>
+        </div>
+        <p class="body-text queue__note reveal" style="--reveal-delay: 0.08s">
+          What's on the desk right now — projects, artists, and campaigns in
+          motion.
+        </p>
+      </header>
+    </div>
 
-    <ul class="queue__list">
-      {
-        queue.map((item, i) => (
-          <li
-            class="queue__item reveal"
-            style={`--reveal-delay: ${i * 0.08}s`}
-          >
-            <span class="queue__number">{item.number}</span>
-            <div class="queue__main">
-              <div class="queue__head">
-                <span class="queue__type">{item.type}</span>
-                <span class="queue__status" data-status={item.status}>
-                  {item.status}
-                </span>
+    <div class="queue__viewport">
+      <ul class="queue__track">
+        {
+          queue.map((item, i) => (
+            <li
+              class="queue__item reveal"
+              style={`--reveal-delay: ${i * 0.08}s`}
+            >
+              <span class="queue__number">{item.number}</span>
+              <div class="queue__main">
+                <div class="queue__head">
+                  <span class="queue__type">{item.type}</span>
+                  <span class="queue__status" data-status={item.status}>
+                    {item.status}
+                  </span>
+                </div>
+                <h3 class="queue__title">{item.title}</h3>
+                <p class="body-text">{item.description}</p>
               </div>
-              <h3 class="queue__title">{item.title}</h3>
-              <p class="body-text">{item.description}</p>
-            </div>
-          </li>
-        ))
-      }
-    </ul>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -62,8 +66,13 @@ import { queue } from "../data/queue";
     text-align: right;
   }
 
-  .queue__list {
+  /* ---------- default: vertical list (no-JS fallback) ---------- */
+  .queue__track {
     border-top: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+    padding-inline: max(
+      var(--gutter),
+      calc((100vw - var(--max)) / 2)
+    );
   }
 
   .queue__item {
@@ -73,7 +82,6 @@ import { queue } from "../data/queue";
     align-items: start;
     padding-block: clamp(1.75rem, 4vw, 2.5rem);
     border-bottom: 1px solid color-mix(in srgb, var(--paper) 20%, transparent);
-    transition: background 0.25s ease;
   }
 
   .queue__number {
@@ -123,6 +131,67 @@ import { queue } from "../data/queue";
   .queue .body-text {
     color: color-mix(in srgb, var(--paper) 65%, transparent);
     max-width: 58ch;
+  }
+
+  /* ---------- has-js: horizontal reel scene ---------- */
+  :global(.has-js) .queue {
+    min-height: 280vh;
+  }
+
+  :global(.has-js) .queue__pin {
+    position: sticky;
+    top: var(--nav-h);
+    min-height: calc(100vh - var(--nav-h));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1.5rem, 4vh, 3rem);
+    padding-block: clamp(2rem, 6vh, 4rem);
+    overflow: hidden;
+  }
+
+  :global(.has-js) .queue .section-head {
+    margin-bottom: 0;
+  }
+
+  :global(.has-js) .queue__viewport {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  :global(.has-js) .queue__track {
+    display: flex;
+    align-items: stretch;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    width: max-content;
+    padding-inline: max(
+      var(--gutter),
+      calc((100vw - var(--max)) / 2)
+    );
+    border-top: 0;
+    will-change: transform;
+  }
+
+  :global(.has-js) .queue__item {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: min(74vw, 32rem);
+    flex-shrink: 0;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border: 1px solid color-mix(in srgb, var(--paper) 22%, transparent);
+    background: rgba(247, 245, 240, 0.03);
+    margin: 0;
+  }
+
+  :global(.has-js) .queue__main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  :global(.has-js) .queue__title {
+    margin-bottom: 0.75rem;
   }
 
   @media (max-width: 760px) {

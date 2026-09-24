@@ -11,6 +11,22 @@ const {
   title = "Hairly Baylen — PR & Artist Communications",
   description = "Portfolio of Hairly Baylen — Development Communication graduate working in PR, artist communications, media relations, and creative strategy.",
 } = Astro.props;
+
+const chapters = [
+  { id: "intro", label: "Intro" },
+  { id: "about", label: "About" },
+  { id: "experience", label: "Experience" },
+  { id: "skills", label: "Skills" },
+  { id: "direction", label: "Direction" },
+  { id: "queue", label: "Queue" },
+  { id: "media", label: "Media" },
+  { id: "newsroom", label: "Newsroom" },
+  { id: "campaign", label: "Campaign" },
+  { id: "events", label: "Events" },
+  { id: "crisis", label: "Crisis" },
+  { id: "practice", label: "Practice" },
+  { id: "contact", label: "Contact" },
+];
 ---
 
 <!doctype html>
@@ -33,34 +49,61 @@ const {
       rel="stylesheet"
     />
     <script is:inline>
-      // Enable reveal animations only when JS runs and motion is allowed.
+      // Enable cinematic scroll only when JS runs and motion is allowed.
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         document.documentElement.classList.add("has-js");
       }
     </script>
   </head>
   <body>
+    <div class="scroll-progress" aria-hidden="true">
+      <div class="scroll-progress__bar"></div>
+    </div>
+
     <Nav />
+
+    <nav class="rail" aria-label="Chapters">
+      <ol>
+        {
+          chapters.map((chapter, i) => (
+            <li>
+              <a href={`#${chapter.id}`}>
+                <span class="rail__label">{chapter.label}</span>
+                <span class="rail__num">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
     <main id="top">
       <slot />
     </main>
+
     <script>
-      import { animate, inView, stagger } from "motion";
+      const clamp = (v: number, min = 0, max = 1) =>
+        Math.min(max, Math.max(min, v));
 
-      const enabled =
-        document.documentElement.classList.contains("has-js");
+      if (document.documentElement.classList.contains("has-js")) {
+        try {
+        const [
+          { animate, inView, stagger },
+          { default: Lenis },
+        ] = await Promise.all([import("motion"), import("lenis")]);
 
-      if (enabled) {
-        const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
+        /* ---------- smooth scroll ---------- */
+        const lenis = new Lenis();
 
-        // Nav entrance
+        /* ---------- entrance + reveals (Motion) ---------- */
         animate(
           ".nav",
           { opacity: [0, 1], y: [-12, 0] },
-          { duration: 0.6, ease, delay: 0.05 },
+          { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.05 },
         );
 
-        // Hero entrance (staggered)
         const heroItems = document.querySelectorAll<HTMLElement>(
           ".hero__inner > *",
         );
@@ -71,12 +114,11 @@ const {
             {
               delay: stagger(0.14, { startDelay: 0.15 }),
               duration: 0.9,
-              ease,
+              ease: [0.22, 1, 0.36, 1],
             },
           );
         }
 
-        // Scroll reveals — once per element
         inView(
           ".reveal",
           (target) => {
@@ -99,11 +141,180 @@ const {
             animate(
               el,
               { opacity: [0, 1], ...from },
-              { duration: 0.8, ease, delay },
+              {
+                duration: 0.8,
+                ease: [0.22, 1, 0.36, 1],
+                delay,
+              },
             );
           },
           { amount: 0.12 },
         );
+
+        /* ---------- scene refs ---------- */
+        const progressBar = document.querySelector<HTMLElement>(
+          ".scroll-progress__bar",
+        );
+        const hero = document.querySelector<HTMLElement>(".hero");
+        const queue = document.getElementById("queue");
+        const queueTrack = document.querySelector<HTMLElement>(".queue__track");
+        const parallaxEls =
+          document.querySelectorAll<HTMLElement>("[data-parallax]");
+        const funnelItems =
+          document.querySelectorAll<HTMLElement>(".funnel__item");
+        const funnel = document.querySelector<HTMLElement>(".funnel");
+        const chainWords =
+          document.querySelectorAll<HTMLElement>(".chain-word");
+        const chain = document.querySelector<HTMLElement>(".recovery-chain");
+        const railLinks = Array.from(
+          document.querySelectorAll<HTMLAnchorElement>('.rail a[href^="#"]'),
+        );
+        const chapters = railLinks
+          .map((a) => ({
+            a,
+            el: document.getElementById(
+              a.getAttribute("href")!.slice(1),
+            ),
+          }))
+          .filter((c): c is { a: HTMLAnchorElement; el: HTMLElement } =>
+            Boolean(c.el),
+          );
+
+        /* ---------- queue reel sizing ---------- */
+        const sizeQueue = () => {
+          if (!queue || !queueTrack) return;
+          const max = Math.max(
+            0,
+            queueTrack.scrollWidth - window.innerWidth,
+          );
+          queue.style.minHeight = `${window.innerHeight + max * 1.2}px`;
+        };
+
+        /* ---------- per-frame scene updates ---------- */
+        const updateProgress = () => {
+          if (!progressBar) return;
+          const max =
+            document.documentElement.scrollHeight - window.innerHeight;
+          const p = max > 0 ? window.scrollY / max : 0;
+          progressBar.style.transform = `scaleX(${clamp(p)})`;
+        };
+
+        const updateHero = () => {
+          if (!hero) return;
+          const start = hero.offsetTop;
+          const span = Math.max(1, hero.offsetHeight * 0.55);
+          const p = clamp((window.scrollY - start) / span);
+          hero.style.setProperty("--hp", p.toFixed(3));
+        };
+
+        const updateQueue = () => {
+          if (!queue || !queueTrack) return;
+          const scrollable = queue.offsetHeight - window.innerHeight;
+          if (scrollable <= 0) return;
+          const p = clamp((window.scrollY - queue.offsetTop) / scrollable);
+          const max = Math.max(
+            0,
+            queueTrack.scrollWidth - window.innerWidth,
+          );
+          queueTrack.style.transform = `translate3d(${(-p * max).toFixed(1)}px, 0, 0)`;
+        };
+
+        const updateParallax = () => {
+          const vh = window.innerHeight;
+          for (const el of parallaxEls) {
+            const rect = el.getBoundingClientRect();
+            if (rect.bottom < -120 || rect.top > vh + 120) continue;
+            const speed = parseFloat(el.dataset.parallax || "0.4");
+            const off =
+              (rect.top + rect.height / 2 - vh / 2) / vh;
+            el.style.transform = `translate3d(0, ${(-off * speed * 130).toFixed(1)}px, 0)`;
+          }
+        };
+
+        const litSequence = (
+          container: HTMLElement | null,
+          selector: string,
+        ) => {
+          if (!container) return;
+          const vh = window.innerHeight;
+          const rect = container.getBoundingClientRect();
+          const p = clamp((vh * 0.88 - rect.top) / (vh * 0.55));
+          const items = container.querySelectorAll<HTMLElement>(selector);
+          items.forEach((item, i) => {
+            item.classList.toggle(
+              "is-lit",
+              p >= (i + 1) / (items.length + 0.4),
+            );
+          });
+        };
+
+        const updateRail = () => {
+          if (!chapters.length) return;
+          const mark = window.innerHeight * 0.35;
+          let active = chapters[0];
+          for (const chapter of chapters) {
+            if (chapter.el.getBoundingClientRect().top <= mark) {
+              active = chapter;
+            }
+          }
+          for (const chapter of chapters) {
+            chapter.a.classList.toggle("is-active", chapter === active);
+          }
+        };
+
+        const updateAll = () => {
+          updateProgress();
+          updateHero();
+          updateQueue();
+          updateParallax();
+          litSequence(funnel, ".funnel__item");
+          litSequence(chain, ".chain-word");
+          updateRail();
+        };
+
+        /* ---------- anchors through Lenis ---------- */
+        document.addEventListener("click", (event) => {
+          const link = (event.target as HTMLElement).closest?.(
+            'a[href^="#"]',
+          ) as HTMLAnchorElement | null;
+          if (!link) return;
+          const hash = link.getAttribute("href");
+          if (!hash || hash === "#") return;
+          const target = document.getElementById(hash.slice(1));
+          if (!target) return;
+          event.preventDefault();
+          lenis.scrollTo(target, { offset: -68, duration: 1.4 });
+        });
+
+        /* ---------- master loop ---------- */
+        sizeQueue();
+        updateAll();
+
+        document.fonts?.ready.then(() => {
+          sizeQueue();
+          updateAll();
+        });
+
+        let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+        window.addEventListener("resize", () => {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(() => {
+            sizeQueue();
+            updateAll();
+          }, 120);
+        });
+
+        const frame = (time: number) => {
+          lenis.raf(time);
+          updateAll();
+          requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+        } catch (err) {
+          // Fail open: never leave content hidden if the scroll engine breaks.
+          console.error("[scroll-engine]", err);
+          document.documentElement.classList.remove("has-js");
+        }
       }
     </script>
   </body>

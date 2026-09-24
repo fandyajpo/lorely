@@ -2,10 +2,10 @@
 import { featuredService as s } from "../data/services";
 ---
 
-<section class="section featured tex-grid" aria-labelledby="service-1-title">
+<section class="section featured tex-grid" id="direction" aria-labelledby="service-1-title">
   <div class="shell">
     <div class="featured__top reveal">
-      <span class="featured__number" aria-hidden="true">{s.number}</span>
+      <span class="featured__number" data-parallax="0.6" aria-hidden="true">{s.number}</span>
       <div class="stack-sm featured__heading">
         <span class="label">Featured Service</span>
         <h2 class="featured__name" id="service-1-title">{s.name}</h2>
@@ -204,6 +204,19 @@ import { featuredService as s } from "../data/services";
     font-size: clamp(1.5rem, 3.5vw, 2.5rem);
     text-transform: uppercase;
     letter-spacing: 0.02em;
+  }
+
+  /* scroll-lit: words brighten sequentially with scroll progress */
+  :global(.has-js) .funnel__text {
+    opacity: 0.18;
+    transition:
+      opacity 0.45s ease,
+      color 0.45s ease;
+  }
+
+  :global(.has-js) .funnel__item.is-lit .funnel__text {
+    opacity: 1;
+    color: var(--accent);
   }
 
   .funnel__arrow {

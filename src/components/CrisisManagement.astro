@@ -8,10 +8,10 @@ import {
 } from "../data/crisis";
 ---
 
-<section class="section crisis tex-dark-dots" aria-labelledby="service-6-title">
+<section class="section crisis tex-dark-dots" id="crisis" aria-labelledby="service-6-title">
   <div class="shell">
     <header class="case__header reveal">
-      <span class="case__number" aria-hidden="true">06</span>
+      <span class="case__number" data-parallax="0.5" aria-hidden="true">06</span>
       <div class="stack-sm">
         <span class="label">Service</span>
         <h2 class="case__title" id="service-6-title">
@@ -93,9 +93,13 @@ import {
           rather than words.
         </p>
         <p class="recovery-chain" aria-label="Crisis PR sequence">
-          Protect the artist <span aria-hidden="true">→</span> protect
-          credibility <span aria-hidden="true">→</span> maintain trust
-          <span aria-hidden="true">→</span> recover reputation
+          <span class="chain-word">Protect the artist</span>
+          <span class="chain-arrow" aria-hidden="true">→</span>
+          <span class="chain-word">protect credibility</span>
+          <span class="chain-arrow" aria-hidden="true">→</span>
+          <span class="chain-word">maintain trust</span>
+          <span class="chain-arrow" aria-hidden="true">→</span>
+          <span class="chain-word">recover reputation</span>
         </p>
       </div>
     </div>
@@ -300,6 +304,17 @@ import {
   .recovery-chain span {
     color: var(--accent);
     margin-inline: 0.3rem;
+  }
+
+  /* scroll-lit sequence */
+  :global(.has-js) .chain-word {
+    color: color-mix(in srgb, var(--paper) 90%, transparent);
+    opacity: 0.22;
+    transition: opacity 0.45s ease;
+  }
+
+  :global(.has-js) .chain-word.is-lit {
+    opacity: 1;
   }
 
   @media (max-width: 1000px) {
