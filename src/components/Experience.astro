@@ -1,5 +1,15 @@
 ---
 import { experiences } from "../data/experiences";
+
+const stats = [
+  { value: experiences.length, label: "Roles & internships" },
+  {
+    value: experiences.filter((e) => e.role.includes("Intern")).length,
+    label: "Internships across media, government & community",
+  },
+  { value: 2, label: "Years in PR & media relations" },
+  { value: 4, label: "Years in Development Communication" },
+];
 ---
 
 <section class="section tex-rules" id="experience" aria-labelledby="exp-title">
@@ -7,13 +17,35 @@ import { experiences } from "../data/experiences";
     <header class="section-head">
       <div class="stack-sm reveal">
         <span class="label">Experiences</span>
-        <h2 class="section-title" id="exp-title">Where I've been.</h2>
+        <h2 class="section-title" id="exp-title" data-split>
+          Where I've been.
+        </h2>
       </div>
       <p class="body-text exp__note">
         Roles across local government, media, community work, and student
         communications.
       </p>
     </header>
+
+    <ul class="stats" aria-label="At a glance">
+      {
+        stats.map((stat, i) => (
+          <li
+            class="stats__item reveal"
+            style={`--reveal-delay: ${i * 0.07}s`}
+          >
+            <span
+              class="stats__num"
+              data-countup={stat.value}
+              data-pad="true"
+            >
+              {String(stat.value).padStart(2, "0")}
+            </span>
+            <span class="stats__label">{stat.label}</span>
+          </li>
+        ))
+      }
+    </ul>
 
     <ol class="timeline">
       {
@@ -46,6 +78,32 @@ import { experiences } from "../data/experiences";
   .exp__note {
     max-width: 30ch;
     text-align: right;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    padding-block: clamp(1.75rem, 4vw, 2.5rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .stats__num {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .stats__label {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    max-width: 22ch;
   }
 
   .timeline {
@@ -100,6 +158,10 @@ import { experiences } from "../data/experiences";
   @media (max-width: 760px) {
     .exp__note {
       text-align: left;
+    }
+
+    .stats {
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .timeline__item {

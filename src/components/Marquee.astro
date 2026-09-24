@@ -1,0 +1,84 @@
+---
+const items = [
+  "Strategic PR",
+  "Media Relations",
+  "Crisis Communications",
+  "Newsroom & Media Materials",
+  "Events & External Relations",
+  "Campaign Planning",
+  "Artist Communications",
+  "Audience Research",
+];
+---
+
+<div class="marquee" data-marquee aria-hidden="true">
+  <div class="marquee__track">
+    {[0, 1].map(() => (
+      <div class="marquee__group">
+        {items.map((item) => (
+          <span class="marquee__item">
+            <span class="marquee__dot"></span>
+            {item}
+          </span>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    border-block: 1px solid var(--line);
+    background: var(--paper-deep);
+    padding-block: 1.05rem;
+  }
+
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll 36s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .marquee.is-running .marquee__track {
+    animation-play-state: running;
+  }
+
+  .marquee__group {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.75rem;
+    padding-right: 1.75rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .marquee__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  @keyframes marquee-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+  }
+</style>

@@ -297,6 +297,92 @@ const chapters = [
           { amount: 0.12 },
         );
 
+        /* ---------- masked word reveals ---------- */
+        document.querySelectorAll<HTMLElement>("[data-split]").forEach((el) => {
+          if (el.children.length) {
+            el.classList.add("is-split");
+            return;
+          }
+          const words = (el.textContent || "").trim().split(/\s+/);
+          el.textContent = "";
+          const frag = document.createDocumentFragment();
+          words.forEach((word, i) => {
+            const mask = document.createElement("span");
+            mask.className = "rw";
+            const inner = document.createElement("span");
+            inner.className = "rw__w";
+            inner.style.setProperty("--i", String(i));
+            inner.textContent = word;
+            mask.appendChild(inner);
+            frag.appendChild(mask);
+            if (i < words.length - 1) {
+              frag.appendChild(document.createTextNode(" "));
+            }
+          });
+          el.appendChild(frag);
+          el.classList.add("is-split");
+          el.getBoundingClientRect(); /* force starting style */
+          inView(
+            el,
+            () => {
+              el.classList.add("is-in");
+            },
+            { amount: 0.35 },
+          );
+        });
+
+        /* ---------- count-up stats ---------- */
+        document
+          .querySelectorAll<HTMLElement>("[data-countup]")
+          .forEach((el) => {
+            const target = parseInt(el.dataset.countup || "", 10);
+            if (Number.isNaN(target)) return;
+            const pad = el.dataset.pad === "true";
+            const fmt = (v: number) =>
+              pad ? String(v).padStart(2, "0") : String(v);
+            inView(
+              el,
+              () => {
+                if (el.dataset.done === "true") return;
+                el.dataset.done = "true";
+                const dur = 900;
+                const start = performance.now();
+                const tick = (now: number) => {
+                  const t = Math.min((now - start) / dur, 1);
+                  const eased = 1 - Math.pow(1 - t, 3);
+                  el.textContent = fmt(Math.round(eased * target));
+                  if (t < 1) requestAnimationFrame(tick);
+                };
+                el.textContent = fmt(0);
+                requestAnimationFrame(tick);
+              },
+              { amount: 0.6 },
+            );
+          });
+
+        /* ---------- marquee: pause off-screen ---------- */
+        document.querySelectorAll<HTMLElement>("[data-marquee]").forEach((m) => {
+          const io = new IntersectionObserver(([entry]) =>
+            m.classList.toggle("is-running", entry.isIntersecting),
+          );
+          io.observe(m);
+        });
+
+        /* ---------- magnetic buttons (fine pointers only) ---------- */
+        if (matchMedia("(pointer: fine)").matches) {
+          document.querySelectorAll<HTMLElement>(".btn").forEach((btn) => {
+            btn.addEventListener("pointermove", (e) => {
+              const r = btn.getBoundingClientRect();
+              const x = ((e.clientX - r.left) / r.width - 0.5) * 14;
+              const y = ((e.clientY - r.top) / r.height - 0.5) * 10;
+              btn.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`;
+            });
+            btn.addEventListener("pointerleave", () => {
+              btn.style.translate = "0px 0px";
+            });
+          });
+        }
+
         /* ---------- scene refs ---------- */
         const progressBar = document.querySelector<HTMLElement>(
           ".scroll-progress__bar",
