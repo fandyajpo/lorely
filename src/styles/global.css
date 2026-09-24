@@ -13,7 +13,8 @@
   --accent: #9c3b1b;
 
   --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Inter Variable", "Inter", system-ui, -apple-system,
+    "Segoe UI", sans-serif;
 
   --step-hero: clamp(4rem, 14vw, 11rem);
   --step-h2: clamp(2.25rem, 5vw, 4rem);

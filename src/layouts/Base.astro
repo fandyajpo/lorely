@@ -1,5 +1,10 @@
 ---
 import "../styles/global.css";
+import "@fontsource/instrument-serif/latin-400.css";
+import "@fontsource/instrument-serif/latin-400-italic.css";
+import "@fontsource-variable/inter/wght.css";
+import instrumentRoman from "@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2?url";
+import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import Nav from "../components/Nav.astro";
 
 interface Props {
@@ -42,11 +47,20 @@ const chapters = [
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <title>{title}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta name="theme-color" content="#f7f5f0" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={instrumentRoman}
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={interLatin}
+      crossorigin
     />
     <script is:inline>
       // Enable cinematic scroll only when JS runs and motion is allowed.
@@ -286,13 +300,21 @@ const chapters = [
           lenis.scrollTo(target, { offset: -68, duration: 1.4 });
         });
 
-        /* ---------- master loop ---------- */
+        /* ---------- master loop (idle-gated: only update on scroll) ---------- */
         sizeQueue();
         updateAll();
 
+        let dirty = true;
+        const markDirty = () => {
+          dirty = true;
+        };
+
+        lenis.on("scroll", markDirty);
+        window.addEventListener("scroll", markDirty, { passive: true });
+
         document.fonts?.ready.then(() => {
           sizeQueue();
-          updateAll();
+          dirty = true;
         });
 
         let resizeTimer: ReturnType<typeof setTimeout> | undefined;
@@ -306,7 +328,10 @@ const chapters = [
 
         const frame = (time: number) => {
           lenis.raf(time);
-          updateAll();
+          if (dirty) {
+            dirty = false;
+            updateAll();
+          }
           requestAnimationFrame(frame);
         };
         requestAnimationFrame(frame);
