@@ -1,0 +1,178 @@
+---
+import {
+  campaignIntro,
+  campaignCaseLabel,
+  campaignSteps,
+} from "../data/campaign";
+---
+
+<section class="section campaign tex-diagonal" aria-labelledby="service-4-title">
+  <div class="shell">
+    <div class="campaign__layout">
+      <div class="campaign__media reveal reveal--left">
+        <div
+          class="ph ph--tall"
+          data-caption="Campaign visual — placeholder"
+          role="img"
+          aria-label="Campaign visual placeholder"
+        >
+        </div>
+      </div>
+
+      <div class="campaign__body">
+        <header class="campaign__header reveal">
+          <span class="case__number" aria-hidden="true">04</span>
+          <div class="stack-sm">
+            <span class="label">Service</span>
+            <h2 class="case__title" id="service-4-title">
+              Strategic PR &amp; Campaign Planning
+            </h2>
+          </div>
+        </header>
+
+        <p class="body-text campaign__intro reveal" style="--reveal-delay: 0.08s">{campaignIntro}</p>
+
+        <div class="campaign__case reveal" style="--reveal-delay: 0.12s">
+          <span class="label">{campaignCaseLabel}</span>
+          <ol class="flow">
+            {
+              campaignSteps.map((step) => (
+                <li class="flow__step">
+                  <span class="flow__label">{step.label}</span>
+                  {step.text && <p class="flow__text">{step.text}</p>}
+                  {step.points && (
+                    <ul class="flow__points">
+                      {step.points.map((p) => (
+                        <li>{p}</li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+
+        <p class="campaign__note italic">
+          Showing how I think — not claiming to already be a senior campaign
+          strategist.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .campaign__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: start;
+  }
+
+  .campaign__media {
+    position: sticky;
+    top: calc(var(--nav-h) + 1.5rem);
+  }
+
+  .campaign__header {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(1rem, 3vw, 2rem);
+    padding-bottom: clamp(1.5rem, 3vw, 2rem);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .case__number {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 7vw, 5rem);
+    line-height: 0.85;
+    color: var(--accent);
+  }
+
+  .case__title {
+    font-size: var(--step-h2);
+    max-width: 16ch;
+  }
+
+  .campaign__intro {
+    margin-bottom: clamp(2rem, 5vw, 3rem);
+  }
+
+  .campaign__case .label {
+    display: block;
+    margin-bottom: 1.25rem;
+    color: var(--ink);
+  }
+
+  .flow {
+    border-top: 1px solid var(--ink);
+  }
+
+  .flow__step {
+    padding-block: 1.25rem;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+
+  .flow__step:not(:last-child)::after {
+    content: "↓";
+    position: absolute;
+    right: 0;
+    bottom: -0.7rem;
+    color: var(--accent);
+    font-size: 0.9rem;
+    background: var(--paper);
+    padding-inline: 0.35rem;
+    z-index: 1;
+  }
+
+  .flow__label {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .flow__text {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    line-height: 1.4;
+  }
+
+  .flow__points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .flow__points li {
+    font-size: 0.82rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.35em 1em;
+    color: var(--ink-soft);
+  }
+
+  .campaign__note {
+    margin-top: clamp(1.5rem, 4vw, 2rem);
+    color: var(--ink-mute);
+    font-size: 1rem;
+  }
+
+  @media (max-width: 900px) {
+    .campaign__layout {
+      grid-template-columns: 1fr;
+    }
+
+    .campaign__media {
+      position: static;
+      max-width: 24rem;
+    }
+  }
+</style>

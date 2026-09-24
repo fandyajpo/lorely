@@ -1,0 +1,110 @@
+---
+import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Hairly Baylen — PR & Artist Communications",
+  description = "Portfolio of Hairly Baylen — Development Communication graduate working in PR, artist communications, media relations, and creative strategy.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      // Enable reveal animations only when JS runs and motion is allowed.
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("has-js");
+      }
+    </script>
+  </head>
+  <body>
+    <Nav />
+    <main id="top">
+      <slot />
+    </main>
+    <script>
+      import { animate, inView, stagger } from "motion";
+
+      const enabled =
+        document.documentElement.classList.contains("has-js");
+
+      if (enabled) {
+        const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
+
+        // Nav entrance
+        animate(
+          ".nav",
+          { opacity: [0, 1], y: [-12, 0] },
+          { duration: 0.6, ease, delay: 0.05 },
+        );
+
+        // Hero entrance (staggered)
+        const heroItems = document.querySelectorAll<HTMLElement>(
+          ".hero__inner > *",
+        );
+        if (heroItems.length) {
+          animate(
+            heroItems,
+            { opacity: [0, 1], y: [28, 0] },
+            {
+              delay: stagger(0.14, { startDelay: 0.15 }),
+              duration: 0.9,
+              ease,
+            },
+          );
+        }
+
+        // Scroll reveals — once per element
+        inView(
+          ".reveal",
+          (target) => {
+            const el = target as HTMLElement;
+            if (el.classList.contains("is-visible")) return;
+            el.classList.add("is-visible");
+
+            const delay =
+              parseFloat(
+                getComputedStyle(el).getPropertyValue("--reveal-delay"),
+              ) || 0;
+
+            let from: Record<string, number[]> = {};
+            if (el.classList.contains("reveal--left")) from = { x: [-28, 0] };
+            else if (el.classList.contains("reveal--right"))
+              from = { x: [28, 0] };
+            else if (!el.classList.contains("reveal--fade"))
+              from = { y: [24, 0] };
+
+            animate(
+              el,
+              { opacity: [0, 1], ...from },
+              { duration: 0.8, ease, delay },
+            );
+          },
+          { amount: 0.12 },
+        );
+      }
+    </script>
+  </body>
+</html>

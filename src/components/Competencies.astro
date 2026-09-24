@@ -1,0 +1,75 @@
+---
+import { competencyGroups } from "../data/skills";
+---
+
+<section class="section competencies tex-grid-lg" aria-labelledby="skills-title">
+  <div class="shell">
+    <header class="section-head">
+      <div class="stack-sm reveal">
+        <span class="label">Capabilities</span>
+        <h2 class="section-title" id="skills-title">
+          Competencies &amp; Tools.
+        </h2>
+      </div>
+    </header>
+
+    <div class="competencies__grid">
+      {
+        competencyGroups.map((group, gi) => (
+          <div
+            class="competencies__group reveal"
+            style={`--reveal-delay: ${gi * 0.12}s`}
+          >
+            <h3 class="competencies__group-title label">
+              {String(gi + 1).padStart(2, "0")} — {group.title}
+            </h3>
+            <ul class="competencies__list">
+              {group.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .competencies__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2.5rem, 7vw, 6rem);
+  }
+
+  .competencies__group-title {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 0.5rem;
+    color: var(--ink);
+  }
+
+  .competencies__list li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.05rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+    line-height: 1.2;
+  }
+
+  .competencies__list li::after {
+    content: "·";
+    color: var(--ink-mute);
+    font-family: var(--font-sans);
+  }
+
+  @media (max-width: 720px) {
+    .competencies__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

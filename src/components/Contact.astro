@@ -1,0 +1,149 @@
+---
+const links = [
+  {
+    label: "Email",
+    value: "hrly.baylen@gmail.com",
+    href: "mailto:hrly.baylen@gmail.com",
+  },
+  {
+    label: "Phone",
+    value: "0992 348 37700",
+    href: "tel:+6399234837700",
+  },
+  {
+    label: "LinkedIn",
+    value: "hairly-l-baylen",
+    href: "https://www.linkedin.com/in/hairly-l-baylen",
+  },
+];
+---
+
+<footer class="section contact tex-glow" id="contact" aria-labelledby="contact-title">
+  <div class="shell">
+    <span class="label">Contact</span>
+
+    <h2 class="contact__title reveal" id="contact-title">
+      Let's make something<br />
+      <span class="italic accent">worth talking about.</span>
+    </h2>
+
+    <div class="contact__grid reveal" style="--reveal-delay: 0.1s">
+      <div class="contact__copy stack-md">
+        <p class="lede">
+          Whether it's an artist rollout, a campaign, or just the beginning of an
+          idea — I'd love to hear about it.
+        </p>
+        <a class="btn btn--solid" href="mailto:hrly.baylen@gmail.com">
+          Start a Conversation
+        </a>
+      </div>
+
+      <ul class="contact__links">
+        {
+          links.map((link, i) => (
+            <li
+              class="reveal reveal--fade"
+              style={`--reveal-delay: ${0.15 + i * 0.08}s`}
+            >
+              <span class="label">{link.label}</span>
+              <a
+                href={link.href}
+                rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+              >
+                {link.value} <span aria-hidden="true">↗</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="contact__foot">
+      <span>© {new Date().getFullYear()} Hairly Baylen</span>
+      <span>PR &amp; Artist Communications</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .contact {
+    background-color: var(--paper-deep);
+    border-top: 0;
+    padding-bottom: clamp(2rem, 5vw, 3rem);
+  }
+
+  .contact__title {
+    font-size: clamp(2.75rem, 8vw, 6.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin-top: clamp(1.25rem, 3vw, 2rem);
+    max-width: 16ch;
+  }
+
+  .contact__grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: clamp(2.5rem, 7vw, 6rem);
+    align-items: start;
+    margin-top: clamp(2.5rem, 6vw, 4.5rem);
+    padding-top: clamp(2rem, 5vw, 3rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .contact__copy .btn {
+    align-self: start;
+  }
+
+  .contact__links li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-block: 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .contact__links li:first-child {
+    border-top: 1px solid var(--line);
+  }
+
+  .contact__links a {
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    word-break: break-word;
+  }
+
+  .contact__links a:hover {
+    color: var(--accent);
+  }
+
+  .contact__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    justify-content: space-between;
+    margin-top: clamp(3rem, 8vw, 5.5rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  .contact__foot a {
+    text-decoration: none;
+  }
+
+  .contact__foot a:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 800px) {
+    .contact__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

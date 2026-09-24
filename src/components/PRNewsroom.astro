@@ -1,0 +1,200 @@
+---
+import {
+  newsroomIntro,
+  newsroomCampaign,
+  newsroomCampaignName,
+  newsroomSamples,
+} from "../data/newsroom";
+---
+
+<section class="section newsroom tex-dots" aria-labelledby="service-3-title">
+  <div class="shell">
+    <header class="case__header reveal">
+      <span class="case__number" aria-hidden="true">03</span>
+      <div class="stack-sm">
+        <span class="label">Service</span>
+        <h2 class="case__title" id="service-3-title">
+          PR Content &amp; Media Materials
+        </h2>
+      </div>
+    </header>
+
+    <div class="newsroom__intro reveal" style="--reveal-delay: 0.08s">
+      <p class="lede">{newsroomIntro}</p>
+      <div class="newsroom__campaign">
+        <span class="label">{newsroomCampaign}</span>
+        <p class="newsroom__campaign-name">{newsroomCampaignName}</p>
+      </div>
+    </div>
+
+    <div class="newsroom__samples">
+      {
+        newsroomSamples.map((sample, i) => (
+          <article
+            class="sample reveal"
+            style={`--reveal-delay: ${i * 0.07}s`}
+          >
+            <header class="sample__head">
+              <span class="sample__num">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h3 class="sample__type">{sample.type}</h3>
+            </header>
+            {sample.points ? (
+              <ul class="sample__points">
+                {sample.points.map((p) => (
+                  <li>{p}</li>
+                ))}
+              </ul>
+            ) : (
+              <p class="sample__content">{sample.content}</p>
+            )}
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .newsroom {
+    background-color: var(--paper-deep);
+  }
+
+  .case__header {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(1rem, 3vw, 2rem);
+    padding-bottom: clamp(1.5rem, 3vw, 2rem);
+    border-bottom: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .case__number {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 0.85;
+    color: var(--accent);
+  }
+
+  .case__title {
+    font-size: var(--step-h2);
+    max-width: 16ch;
+  }
+
+  .newsroom__intro {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: end;
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .newsroom__campaign {
+    border-left: 2px solid var(--accent);
+    padding-left: 1.25rem;
+  }
+
+  .newsroom__campaign-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 2.2vw, 1.4rem);
+    margin-top: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .newsroom__samples {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+  }
+
+  .sample {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: clamp(1.1rem, 2.5vw, 1.75rem);
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .sample:nth-child(1),
+  .sample:nth-child(2) {
+    grid-column: span 3;
+  }
+
+  .sample__head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .sample__num {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .sample__type {
+    font-family: var(--font-sans);
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .sample__content {
+    font-family: var(--font-display);
+    font-size: clamp(1.02rem, 1.8vw, 1.2rem);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    white-space: pre-line;
+  }
+
+  .sample__points li {
+    padding-block: 0.55rem;
+    border-bottom: 1px dashed var(--line);
+    color: var(--ink-soft);
+    font-size: 0.97rem;
+    padding-left: 1.1rem;
+    position: relative;
+  }
+
+  .sample__points li:last-child {
+    border-bottom: 0;
+  }
+
+  .sample__points li::before {
+    content: "·";
+    position: absolute;
+    left: 0.2rem;
+    color: var(--accent);
+  }
+
+  @media (max-width: 900px) {
+    .newsroom__intro {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .newsroom__samples {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .sample,
+    .sample:nth-child(1),
+    .sample:nth-child(2) {
+      grid-column: span 1;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .newsroom__samples {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

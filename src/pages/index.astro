@@ -1,0 +1,38 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+import Intro from "../components/Intro.astro";
+import About from "../components/About.astro";
+import Experience from "../components/Experience.astro";
+import Competencies from "../components/Competencies.astro";
+import FeaturedService from "../components/FeaturedService.astro";
+import Queue from "../components/Queue.astro";
+import MediaRelations from "../components/MediaRelations.astro";
+import PRNewsroom from "../components/PRNewsroom.astro";
+import CampaignPlanning from "../components/CampaignPlanning.astro";
+import EventsRelations from "../components/EventsRelations.astro";
+import CrisisManagement from "../components/CrisisManagement.astro";
+import Practice from "../components/Practice.astro";
+import Contact from "../components/Contact.astro";
+---
+
+<Base>
+  <Hero />
+  <Intro />
+  <About />
+  <Experience />
+  <Competencies />
+  <FeaturedService />
+  <Queue />
+
+  <div id="work">
+    <MediaRelations />
+    <PRNewsroom />
+    <CampaignPlanning />
+    <EventsRelations />
+    <CrisisManagement />
+    <Practice />
+  </div>
+
+  <Contact />
+</Base>

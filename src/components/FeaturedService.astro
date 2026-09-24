@@ -1,0 +1,483 @@
+---
+import { featuredService as s } from "../data/services";
+---
+
+<section class="section featured tex-grid" aria-labelledby="service-1-title">
+  <div class="shell">
+    <div class="featured__top reveal">
+      <span class="featured__number" aria-hidden="true">{s.number}</span>
+      <div class="stack-sm featured__heading">
+        <span class="label">Featured Service</span>
+        <h2 class="featured__name" id="service-1-title">{s.name}</h2>
+        <p class="featured__tagline italic">{s.tagline}</p>
+      </div>
+    </div>
+
+    <p class="lede featured__overview reveal" style="--reveal-delay: 0.08s">{s.overview}</p>
+
+    <ol class="funnel reveal" style="--reveal-delay: 0.16s" aria-label="Awareness to action">
+      {
+        s.funnel.map((step, i) => (
+          <li class="funnel__item">
+            <span class="funnel__text">{step}</span>
+            {i < s.funnel.length - 1 && (
+              <span class="funnel__arrow" aria-hidden="true">
+                →
+              </span>
+            )}
+          </li>
+        ))
+      }
+    </ol>
+
+    <!-- Message development -->
+    <div class="block reveal">
+      <div class="block__head">
+        <span class="label">Artist Communications &amp; Message Development</span>
+        <h3 class="block__title">From concept to language.</h3>
+      </div>
+
+      <div class="block__grid">
+        <div class="stack-md">
+          <ol class="mini-flow" aria-label="Message development flow">
+            {
+              s.messageDevelopment.flow.map((step, i) => (
+                <li class="mini-flow__item">
+                  <span>{step}</span>
+                  {i < s.messageDevelopment.flow.length - 1 && (
+                    <span class="mini-flow__arrow" aria-hidden="true">
+                      →
+                    </span>
+                  )}
+                </li>
+              ))
+            }
+          </ol>
+          <ul class="ticks">
+            {
+              s.messageDevelopment.bullets.map((b) => (
+                <li>{b}</li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="example">
+          <span class="label example__label">{s.example.caseLabel}</span>
+          <ol class="example__chain">
+            {
+              s.example.steps.map((step) => (
+                <li class="example__step">
+                  <span class="example__tag">{step.label}</span>
+                  {step.text && <p class="example__text">{step.text}</p>}
+                  {step.points && (
+                    <ul class="example__points">
+                      {step.points.map((p) => (
+                        <li>{p}</li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interview prep -->
+    <div class="block reveal">
+      <div class="block__head">
+        <span class="label">Artist Interview Preparation</span>
+        <h3 class="block__title">Ready before the mic is on.</h3>
+      </div>
+
+      <div class="block__grid">
+        <ul class="deliverables">
+          {
+            s.interviewPrep.deliverables.map((item, i) => (
+              <li>
+                <span class="deliverables__num">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="prep-example">
+          <span class="label">Example — {s.interviewPrep.scenario}</span>
+          <p class="prep-example__q">{s.interviewPrep.question}</p>
+          <ol class="prep-example__steps">
+            {
+              s.interviewPrep.steps.map((step) => (
+                <li>
+                  <span class="prep-example__label">{step.label}</span>
+                  {step.text && <p>{step.text}</p>}
+                  {step.points && (
+                    <ul class="prep-example__points">
+                      {step.points.map((p) => (
+                        <li>{p}</li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contrast -->
+    <div class="contrast reveal" style="--reveal-delay: 0.08s">
+      <div class="contrast__item contrast__item--wrong">
+        <span class="contrast__tag">Scripting</span>
+        <p><span class="contrast__mark" aria-hidden="true">×</span> {s.contrast.wrong}</p>
+      </div>
+      <div class="contrast__item contrast__item--right">
+        <span class="contrast__tag">Preparation</span>
+        <p><span class="contrast__mark" aria-hidden="true">✓</span> {s.contrast.right}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .featured {
+    background-color: var(--paper-deep);
+  }
+
+  .featured__top {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: clamp(1.25rem, 4vw, 3rem);
+    align-items: start;
+    margin-bottom: clamp(2rem, 5vw, 3rem);
+  }
+
+  .featured__number {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 12vw, 9rem);
+    line-height: 0.8;
+    color: var(--accent);
+  }
+
+  .featured__name {
+    font-size: var(--step-h2);
+  }
+
+  .featured__tagline {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    color: var(--ink-soft);
+    max-width: 34ch;
+    line-height: 1.3;
+  }
+
+  .featured__overview {
+    max-width: 68ch;
+    margin-bottom: clamp(2rem, 5vw, 3rem);
+  }
+
+  /* funnel */
+  .funnel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: clamp(3rem, 7vw, 5rem);
+  }
+
+  .funnel__item {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .funnel__text {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .funnel__arrow {
+    color: var(--accent);
+    font-size: 1.4rem;
+  }
+
+  /* blocks */
+  .block + .block {
+    margin-top: clamp(3rem, 7vw, 5rem);
+    padding-top: clamp(3rem, 7vw, 5rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .block__head {
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .block__title {
+    font-size: var(--step-h3);
+    margin-top: 0.6rem;
+  }
+
+  .block__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  .mini-flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mini-flow__item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .mini-flow__arrow {
+    color: var(--accent);
+  }
+
+  .ticks li {
+    padding-block: 0.7rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-soft);
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .ticks li::before {
+    content: "→";
+    color: var(--accent);
+  }
+
+  /* example chain */
+  .example {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .example__label {
+    color: var(--ink);
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+    display: block;
+  }
+
+  .example__chain {
+    counter-reset: none;
+  }
+
+  .example__step {
+    padding-block: 1.1rem;
+    border-bottom: 1px dashed var(--line);
+    position: relative;
+  }
+
+  .example__step:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .example__step:not(:last-child)::after {
+    content: "↓";
+    display: block;
+    color: var(--accent);
+    margin-top: 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  .example__tag {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .example__text {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .example__points {
+    margin-top: 0.6rem;
+  }
+
+  .example__points li {
+    position: relative;
+    padding-left: 1.2rem;
+    padding-block: 0.25rem;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .example__points li::before {
+    content: "·";
+    position: absolute;
+    left: 0.25rem;
+    color: var(--accent);
+  }
+
+  /* interview prep */
+  .deliverables li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+  }
+
+  .deliverables li:first-child {
+    border-top: 1px solid var(--line);
+  }
+
+  .deliverables__num {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+  }
+
+  .prep-example {
+    background: var(--ink);
+    color: var(--paper);
+    padding: clamp(1.5rem, 3.5vw, 2.5rem);
+  }
+
+  .prep-example .label {
+    color: color-mix(in srgb, var(--paper) 55%, transparent);
+  }
+
+  .prep-example__q {
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+    line-height: 1.3;
+    margin-top: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  }
+
+  .prep-example__steps li {
+    padding-block: 1rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+  }
+
+  .prep-example__steps li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .prep-example__steps p {
+    margin-top: 0.4rem;
+    color: color-mix(in srgb, var(--paper) 75%, transparent);
+    font-size: 0.97rem;
+  }
+
+  .prep-example__label {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #e8a48a;
+    font-weight: 500;
+  }
+
+  .prep-example__points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.7rem;
+  }
+
+  .prep-example__points li {
+    border: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+    border-radius: 999px;
+    padding: 0.3em 0.9em;
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--paper) 80%, transparent);
+  }
+
+  /* contrast */
+  .contrast {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    margin-top: clamp(3rem, 7vw, 5rem);
+    padding-top: clamp(2rem, 5vw, 3rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .contrast__item {
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+    background: var(--paper);
+  }
+
+  .contrast__item--right {
+    border-color: var(--ink);
+  }
+
+  .contrast__tag {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 1rem;
+  }
+
+  .contrast__item p {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.4vw, 1.55rem);
+    line-height: 1.35;
+  }
+
+  .contrast__mark {
+    color: var(--accent);
+    margin-right: 0.35rem;
+  }
+
+  .contrast__item--wrong .contrast__mark {
+    color: var(--ink-mute);
+  }
+
+  @media (max-width: 860px) {
+    .block__grid,
+    .contrast {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .featured__top {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

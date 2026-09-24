@@ -1,0 +1,77 @@
+
+<section class="hero section--flush tex-glow">
+  <div class="shell hero__inner">
+    <span class="label">PR &amp; Artist Communications</span>
+
+    <h1 class="hero__name">Hairly Baylen</h1>
+
+    <div class="hero__grid">
+      <p class="hero__position">
+        Ideas with intention.<br />
+        Communication that builds connection.
+      </p>
+
+      <div class="hero__aside stack-md">
+        <p class="body-text">
+          A Development Communication graduate working across artist relations,
+          media, and community — turning ideas into action.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--solid" href="#work">Explore My Work</a>
+          <a class="btn btn--ghost" href="#contact">Get in Touch</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-top: clamp(3.5rem, 10vw, 7rem);
+    padding-bottom: clamp(4rem, 12vw, 8.5rem);
+  }
+
+  .hero__inner {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .hero__name {
+    font-size: clamp(3.25rem, 11vw, 8.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+  }
+
+  .hero__grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: end;
+    margin-top: clamp(1.5rem, 4vw, 3rem);
+    padding-top: clamp(1.5rem, 4vw, 2.5rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .hero__position {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3.4vw, 2.75rem);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    max-width: 22ch;
+    text-transform: uppercase;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+  }
+
+  @media (max-width: 860px) {
+    .hero__grid {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+  }
+</style>
