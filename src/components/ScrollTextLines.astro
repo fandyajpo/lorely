@@ -1,0 +1,187 @@
+---
+/**
+ * ScrollTextLines — scroll-driven editorial text reveal.
+ * Progress through the pinned section is divided across each line;
+ * lines interpolate from muted to fully visible via opacity only
+ * (GPU-composited, reversible, no entrance triggers).
+ *
+ * Usage: <ScrollTextLines />
+ */
+const lead = [
+  "I connect artists,",
+  "stories,",
+  "people,",
+  "and opportunities.",
+];
+
+const sub = [
+  "Through PR and artist communications,",
+  "I help creative work find the right audience.",
+];
+---
+
+<section class="stx" data-scroll-text aria-label="Manifesto">
+  <div class="stx__pin">
+    <div class="stx__inner shell">
+      <span class="label stx__label">Manifesto</span>
+
+      <p class="stx__lead">
+        {
+          lead.map((line) => (
+            <>
+              <span class="stx__line" data-stx-line>
+                {line}
+              </span>{" "}
+            </>
+          ))
+        }
+      </p>
+
+      <p class="stx__sub">
+        {
+          sub.map((line) => (
+            <>
+              <span class="stx__line stx__line--sub" data-stx-line>
+                {line}
+              </span>{" "}
+            </>
+          ))
+        }
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stx {
+    position: relative;
+    height: 240vh;
+    background: var(--paper);
+  }
+
+  .stx__pin {
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    background: var(--paper);
+    padding-block: clamp(4rem, 10vh, 7rem);
+  }
+
+  .stx__inner {
+    width: 100%;
+  }
+
+  .stx__label {
+    margin-bottom: clamp(2rem, 5vh, 3.5rem);
+  }
+
+  .stx__lead,
+  .stx__sub {
+    margin: 0;
+  }
+
+  .stx__line {
+    display: block;
+    color: var(--ink);
+  }
+
+  .stx__lead .stx__line {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 7.2vw, 5.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+  }
+
+  .stx__line--sub {
+    font-family: var(--font-sans);
+    font-size: clamp(1.2rem, 2.8vw, 2.2rem);
+    line-height: 1.4;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+  }
+
+  .stx__sub {
+    margin-top: clamp(2.25rem, 6vh, 4rem);
+  }
+
+  .has-js .stx__line {
+    opacity: 0.14;
+  }
+
+  @media (max-width: 760px) {
+    .stx {
+      height: 190vh;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stx {
+      height: auto;
+    }
+
+    .stx__pin {
+      position: static;
+      min-height: 0;
+      padding-block: clamp(5rem, 12vh, 8rem);
+    }
+
+    .stx__line {
+      opacity: 1 !important;
+    }
+  }
+</style>
+
+<script>
+  const showAll = (lines: HTMLElement[]) => {
+    lines.forEach((l) => (l.style.opacity = "1"));
+  };
+
+  const boot = async () => {
+    if (!document.documentElement.classList.contains("has-js")) return;
+
+    const section = document.querySelector<HTMLElement>("[data-scroll-text]");
+    if (!section) return;
+    const lines = Array.from(
+      section.querySelectorAll<HTMLElement>("[data-stx-line]"),
+    );
+    if (!lines.length) return;
+
+    try {
+      const { scroll } = await import("motion");
+
+      const n = lines.length;
+      const window_ = 0.35; /* each line reveals over 35% of progress */
+      const step = n > 1 ? (1 - window_) / (n - 1) : 0;
+
+      const last = new Array<number>(n).fill(-1);
+
+      scroll(
+        (progress: number) => {
+          for (let i = 0; i < n; i++) {
+            const local = Math.min(
+              1,
+              Math.max(0, (progress - i * step) / window_),
+            );
+            const opacity = 0.14 + local * 0.86;
+            if (Math.abs(opacity - last[i]) > 0.004) {
+              last[i] = opacity;
+              lines[i].style.opacity = opacity.toFixed(3);
+            }
+          }
+        },
+        {
+          target: section,
+          /* 0 = pin starts (top meets top), 1 = pin ends (bottom meets bottom) */
+          offset: ["start start", "end end"],
+        },
+      );
+    } catch {
+      showAll(lines);
+    }
+  };
+
+  boot();
+</script>

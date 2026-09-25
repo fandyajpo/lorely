@@ -1,0 +1,330 @@
+---
+/**
+ * Little Ghost Cursor Companion
+ * A tiny ghost that floats after the cursor with soft inertia,
+ * eyes that actively watch the pointer, random blinks, and a
+ * subtle idle float. Zero dependencies — plain CSS + vanilla JS.
+ *
+ * Usage: <LittleGhost />  (anywhere in a layout or page)
+ */
+---
+
+<div class="little-ghost" data-little-ghost aria-hidden="true">
+  <div class="little-ghost__float">
+    <div class="little-ghost__lean">
+      <svg
+        class="little-ghost__svg"
+        viewBox="0 0 48 50"
+        width="44"
+        height="46"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <!-- body: rounded dome + wavy tail -->
+        <path
+          class="ghost__body"
+          d="M24 2
+             C12.5 2 4 10.7 4 21.5
+             V42
+             a5 5 0 0 0 10 0
+             a5 5 0 0 0 10 0
+             a5 5 0 0 0 10 0
+             a5 5 0 0 0 10 0
+             V21.5
+             C44 10.7 35.5 2 24 2 Z"
+        />
+        <!-- violet blush -->
+        <ellipse class="ghost__blush" cx="11.5" cy="33" rx="2.8" ry="1.6" />
+        <ellipse class="ghost__blush" cx="36.5" cy="33" rx="2.8" ry="1.6" />
+        <!-- eyes -->
+        <g class="ghost__eye ghost__eye--l">
+          <ellipse class="ghost__sclera" cx="17.5" cy="24" rx="5" ry="6" />
+          <circle class="ghost__pupil" data-pupil cx="17.5" cy="24" r="2.2" />
+        </g>
+        <g class="ghost__eye ghost__eye--r">
+          <ellipse class="ghost__sclera" cx="30.5" cy="24" rx="5" ry="6" />
+          <circle class="ghost__pupil" data-pupil cx="30.5" cy="24" r="2.2" />
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<style>
+  .little-ghost {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 44px;
+    height: 46px;
+    z-index: 45; /* above content, below nav (50) / curtain (200) */
+    pointer-events: none;
+    user-select: none;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    will-change: transform;
+  }
+
+  .little-ghost.is-active {
+    opacity: 1;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .little-ghost {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .little-ghost {
+      display: none !important;
+    }
+  }
+
+  .little-ghost__float {
+    animation: ghost-float 3.4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @keyframes ghost-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  .little-ghost__lean {
+    transform-origin: 50% 80%;
+    will-change: transform;
+  }
+
+  .ghost__body {
+    fill: #fdfcfa;
+    stroke: var(--ink);
+    stroke-width: 2.2;
+    stroke-linejoin: round;
+  }
+
+  .ghost__blush {
+    fill: var(--accent);
+    opacity: 0.4;
+  }
+
+  .ghost__sclera {
+    fill: #fff;
+    stroke: var(--ink);
+    stroke-width: 1.6;
+  }
+
+  .ghost__pupil {
+    fill: var(--ink);
+    will-change: transform;
+  }
+
+  .ghost__eye {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .little-ghost.is-blinking .ghost__eye {
+    animation: ghost-blink var(--ghost-blink-dur, 150ms) ease-in-out;
+  }
+
+  @keyframes ghost-blink {
+    0%,
+    100% {
+      transform: scaleY(1);
+    }
+    45%,
+    55% {
+      transform: scaleY(0.08);
+    }
+  }
+</style>
+
+<script>
+  interface GhostCleanup {
+    (): void;
+  }
+
+  let cleanup: GhostCleanup | null = null;
+
+  const init = (): GhostCleanup | null => {
+    const fine = matchMedia("(hover: hover) and (pointer: fine)");
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    if (!fine.matches || reduce.matches) return null;
+
+    const root = document.querySelector<HTMLElement>("[data-little-ghost]");
+    if (!root) return null;
+
+    const leanEl = root.querySelector<HTMLElement>(".little-ghost__lean");
+    const pupils =
+      root.querySelectorAll<SVGElement>("[data-pupil]");
+    if (!leanEl || pupils.length < 2) return null;
+
+    /* geometry (recomputed on resize) */
+    let w = root.offsetWidth || 44;
+    let h = root.offsetHeight || 46;
+    const measure = () => {
+      w = root.offsetWidth || 44;
+      h = root.offsetHeight || 46;
+    };
+    measure();
+
+    /* state — plain numbers, no per-frame allocation */
+    let mx = -9999;
+    let my = -9999;
+    let gx = -9999;
+    let gy = -9999;
+    let targetX = -9999;
+    let targetY = -9999;
+    let pdx = 0;
+    let pdy = 0;
+    let tpdx = 0;
+    let tpdy = 0;
+    let lean = 0;
+    let tlean = 0;
+    let active = false;
+    let raf = 0;
+
+    /* last written values — skip style writes when settled
+       (finite sentinels: NaN would make the epsilon checks false forever) */
+    let wgx = 1e9;
+    let wgy = 1e9;
+    let wpdx = 1e9;
+    let wpdy = 1e9;
+    let wlean = 1e9;
+
+    const MAX_X = 2.4; /* pupil travel inside the eye */
+    const MAX_Y = 3.2;
+
+    const frame = () => {
+      /* body follows with inertia */
+      gx += (targetX - gx) * 0.08;
+      gy += (targetY - gy) * 0.08;
+
+      /* direction from eye area toward cursor */
+      const ex = gx + w * 0.5;
+      const ey = gy + h * 0.44;
+      const dx = mx - ex;
+      const dy = my - ey;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const near = dist < 80 ? dist / 80 : 1;
+
+      tpdx = (dx / dist) * MAX_X * near;
+      tpdy = (dy / dist) * MAX_Y * near;
+      pdx += (tpdx - pdx) * 0.16;
+      pdy += (tpdy - pdy) * 0.16;
+
+      /* subtle lean toward the cursor side */
+      tlean = Math.max(-7, Math.min(7, dx * 0.015));
+      lean += (tlean - lean) * 0.08;
+
+      /* write only what changed */
+      if (Math.abs(gx - wgx) > 0.03 || Math.abs(gy - wgy) > 0.03) {
+        wgx = gx;
+        wgy = gy;
+        root.style.transform = `translate3d(${gx.toFixed(2)}px, ${gy.toFixed(2)}px, 0)`;
+      }
+      if (Math.abs(pdx - wpdx) > 0.01 || Math.abs(pdy - wpdy) > 0.01) {
+        wpdx = pdx;
+        wpdy = pdy;
+        const t = `translate(${pdx.toFixed(2)}px, ${pdy.toFixed(2)}px)`;
+        pupils[0].style.transform = t;
+        pupils[1].style.transform = t;
+      }
+      if (Math.abs(lean - wlean) > 0.03) {
+        wlean = lean;
+        leanEl.style.transform = `rotate(${lean.toFixed(2)}deg)`;
+      }
+
+      raf = requestAnimationFrame(frame);
+    };
+
+    const start = () => {
+      if (!raf) raf = requestAnimationFrame(frame);
+    };
+    const stop = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+    };
+
+    /* ---------- pointer ---------- */
+    const onMove = (e: PointerEvent) => {
+      mx = e.clientX;
+      my = e.clientY;
+      if (!active) {
+        active = true;
+        targetX = mx + 16;
+        targetY = my + 14;
+        gx = targetX;
+        gy = targetY;
+        root.classList.add("is-active");
+      } else {
+        targetX = mx + 16;
+        targetY = my + 14;
+      }
+      start();
+    };
+
+    /* ---------- random blinking ---------- */
+    let blinkTimer = 0;
+    const scheduleBlink = () => {
+      blinkTimer = window.setTimeout(
+        () => {
+          const long = Math.random() < 0.15;
+          const dur = long
+            ? 320 + Math.random() * 120
+            : 120 + Math.random() * 60;
+          root.style.setProperty("--ghost-blink-dur", `${dur.toFixed(0)}ms`);
+          root.classList.remove("is-blinking");
+          void root.offsetWidth; /* restart the CSS animation */
+          root.classList.add("is-blinking");
+          scheduleBlink();
+        },
+        2800 + Math.random() * 2400,
+      );
+    };
+    scheduleBlink();
+
+    /* ---------- lifecycle ---------- */
+    const onVis = () => (document.hidden ? stop() : start());
+    const onResize = () => measure();
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("resize", onResize, { passive: true });
+
+    return () => {
+      stop();
+      window.clearTimeout(blinkTimer);
+      window.removeEventListener("pointermove", onMove);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("resize", onResize);
+      root.classList.remove("is-active", "is-blinking");
+      root.style.transform = "";
+      leanEl.style.transform = "";
+    };
+  };
+
+  const mount = () => {
+    if (cleanup) {
+      cleanup();
+      cleanup = null;
+    }
+    cleanup = init();
+  };
+
+  /* safe for View Transitions: no duplicate listeners, cleanup on swap */
+  mount();
+  document.addEventListener("astro:page-load", mount);
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) {
+      cleanup();
+      cleanup = null;
+    }
+  });
+</script>
