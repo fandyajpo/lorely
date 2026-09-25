@@ -13,16 +13,18 @@ const items = [
 
 <div class="marquee" data-marquee aria-hidden="true">
   <div class="marquee__track">
-    {[0, 1].map(() => (
-      <div class="marquee__group">
-        {items.map((item) => (
-          <span class="marquee__item">
-            <span class="marquee__dot"></span>
-            {item}
-          </span>
-        ))}
-      </div>
-    ))}
+    {
+      [0, 1].map(() => (
+        <div class="marquee__group">
+          {items.map((item) => (
+            <span class="marquee__item">
+              <span class="marquee__dot" />
+              {item}
+            </span>
+          ))}
+        </div>
+      ))
+    }
   </div>
 </div>
 
@@ -30,7 +32,7 @@ const items = [
   .marquee {
     overflow: hidden;
     border-block: 1px solid var(--line);
-    background: var(--paper-deep);
+    background-color: white;
     padding-block: 1.05rem;
   }
 
